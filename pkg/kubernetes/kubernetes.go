@@ -18,10 +18,14 @@ import (
 )
 
 var (
-	client        = createClient()
-	ContextName   = ""
-	ServerVersion = ""
+	client        *kubernetes.Clientset
+	ContextName   string
+	ServerVersion string
 )
+
+func Init() {
+	client = createClient()
+}
 
 func createClient() *kubernetes.Clientset {
 	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()

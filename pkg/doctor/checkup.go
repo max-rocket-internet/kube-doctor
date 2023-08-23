@@ -11,6 +11,8 @@ import (
 )
 
 func DoCheckUp(cCtx *cli.Context) {
+	kubernetes.Init()
+
 	log.Setup(cCtx.Bool("debug"), cCtx.Bool("warning-symptoms"))
 	log.Debug(fmt.Sprintf("Connected to cluster from context %s running version %s", kubernetes.ContextName, kubernetes.ServerVersion))
 
