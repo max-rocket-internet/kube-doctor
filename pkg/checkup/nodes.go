@@ -24,7 +24,7 @@ func CheckNodes(resources *v1.NodeList) (results symptoms.SymptomList) {
 		for _, condition := range node.Status.Conditions {
 			if condition.Type == "Ready" {
 				if condition.Status != "True" {
-					if time.Now().Sub(node.ObjectMeta.CreationTimestamp.Time).Minutes() > 5 {
+					if time.Since(node.ObjectMeta.CreationTimestamp.Time).Minutes() > 5 {
 						results.Add(symptoms.Symptom{
 							Message:      "older than 5 minutes and not Ready",
 							Severity:     "critical",

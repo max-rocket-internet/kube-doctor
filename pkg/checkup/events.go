@@ -22,7 +22,7 @@ func CheckEvents(resources *v1.EventList) (results symptoms.SymptomList) {
 		if event.Source.Component == "cluster-autoscaler" {
 			if event.Reason == "ScaleDown" || event.Reason == "TriggeredScaleUp" || event.Type != "Normal" {
 				results.Add(symptoms.Symptom{
-					Message:      fmt.Sprintf("(%s) %.1f minutes ago: %s", event.InvolvedObject.Kind, time.Now().Sub(event.LastTimestamp.Time).Minutes(), event.Message),
+					Message:      fmt.Sprintf("(%s) %.1f minutes ago: %s", event.InvolvedObject.Kind, time.Since(event.LastTimestamp.Time).Minutes(), event.Message),
 					Severity:     "critical",
 					ResourceName: event.InvolvedObject.Name,
 					ResourceType: resourceType,
@@ -33,7 +33,7 @@ func CheckEvents(resources *v1.EventList) (results symptoms.SymptomList) {
 
 		if event.Type != "Normal" && event.Source.Component == "service-controller" {
 			results.Add(symptoms.Symptom{
-				Message:      fmt.Sprintf("(%s) %.1f minutes ago: %s", event.InvolvedObject.Kind, time.Now().Sub(event.LastTimestamp.Time).Minutes(), event.Message),
+				Message:      fmt.Sprintf("(%s) %.1f minutes ago: %s", event.InvolvedObject.Kind, time.Since(event.LastTimestamp.Time).Minutes(), event.Message),
 				Severity:     "critical",
 				ResourceName: event.InvolvedObject.Name,
 				ResourceType: resourceType,
@@ -43,7 +43,7 @@ func CheckEvents(resources *v1.EventList) (results symptoms.SymptomList) {
 
 		if event.Type != "Normal" && event.Source.Component == "default-scheduler" && event.Reason != "FailedScheduling" {
 			results.Add(symptoms.Symptom{
-				Message:      fmt.Sprintf("(%s) %.1f minutes ago: %s", event.InvolvedObject.Kind, time.Now().Sub(event.LastTimestamp.Time).Minutes(), event.Message),
+				Message:      fmt.Sprintf("(%s) %.1f minutes ago: %s", event.InvolvedObject.Kind, time.Since(event.LastTimestamp.Time).Minutes(), event.Message),
 				Severity:     "critical",
 				ResourceName: event.InvolvedObject.Name,
 				ResourceType: resourceType,
@@ -53,7 +53,7 @@ func CheckEvents(resources *v1.EventList) (results symptoms.SymptomList) {
 
 		if event.Type != "Normal" && event.Source.Component == "kubelet" && event.Reason != "Unhealthy" {
 			results.Add(symptoms.Symptom{
-				Message:      fmt.Sprintf("(%s) %.1f minutes ago: %s", event.InvolvedObject.Kind, time.Now().Sub(event.LastTimestamp.Time).Minutes(), event.Message),
+				Message:      fmt.Sprintf("(%s) %.1f minutes ago: %s", event.InvolvedObject.Kind, time.Since(event.LastTimestamp.Time).Minutes(), event.Message),
 				Severity:     "critical",
 				ResourceName: event.InvolvedObject.Name,
 				ResourceType: resourceType,

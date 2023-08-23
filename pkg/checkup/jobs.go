@@ -18,7 +18,7 @@ func CheckJobs(resources *batchv1.JobList) (results symptoms.SymptomList) {
 		log.Debug(fmt.Sprintf("Examining Job %s/%s", job.Namespace, job.Name))
 
 		// Ignore jobs older than 1 hour
-		if job.Status.CompletionTime != nil && time.Now().Sub(job.Status.CompletionTime.Time).Minutes() > 60 {
+		if job.Status.CompletionTime != nil && time.Since(job.Status.CompletionTime.Time).Minutes() > 60 {
 			continue
 		}
 

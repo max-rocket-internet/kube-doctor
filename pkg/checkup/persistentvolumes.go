@@ -17,7 +17,7 @@ func CheckPersistentVolumes(resources *v1.PersistentVolumeList) (results symptom
 	for _, volume := range resources.Items {
 		log.Debug(fmt.Sprintf("Examining PersistentVolume %s", volume.Name))
 
-		if volume.Status.Phase != "Bound" && time.Now().Sub(volume.CreationTimestamp.Time).Minutes() > 5 {
+		if volume.Status.Phase != "Bound" && time.Since(volume.CreationTimestamp.Time).Minutes() > 5 {
 			results.Add(symptoms.Symptom{
 				Message:      "older than 5 minutes and status is not bound",
 				Severity:     "critical",
