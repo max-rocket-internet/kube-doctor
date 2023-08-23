@@ -17,7 +17,7 @@ func CheckPersistentVolumeClaims(resources *v1.PersistentVolumeClaimList) (resul
 	for _, pvc := range resources.Items {
 		log.Debug(fmt.Sprintf("Examining PersistentVolumeClaim %s/%s", pvc.Name, pvc.Namespace))
 
-		if pvc.Status.Phase != "Bound" && time.Now().Sub(pvc.CreationTimestamp.Time).Minutes() > 5 {
+		if pvc.Status.Phase != "Bound" && time.Since(pvc.CreationTimestamp.Time).Minutes() > 5 {
 			results.Add(symptoms.Symptom{
 				Message:      "older than 5 minutes and status is not bound",
 				Severity:     "critical",
@@ -27,7 +27,7 @@ func CheckPersistentVolumeClaims(resources *v1.PersistentVolumeClaimList) (resul
 		}
 	}
 
-	log.PrintEnd(len(resources.Items), len(results.Symptoms))
+	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
 
 	return results
 }

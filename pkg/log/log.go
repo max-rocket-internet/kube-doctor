@@ -19,7 +19,7 @@ var (
 	colorResourceName      = color.New(color.FgBlue, color.Bold).SprintFunc()
 	colorResourceNamespace = color.New(color.FgGreen).SprintFunc()
 	colorDebug             = color.New(color.Faint).SprintFunc()
-	messageCharacterLimit  = 100
+	messageCharacterLimit  = 120
 )
 
 func init() {
@@ -49,11 +49,11 @@ func Info(message string) {
 }
 
 func Error(message string, e error) {
-	infoLogger.Println(fmt.Sprintf("❗ %s: %s", message, e))
+	infoLogger.Printf("❗ %s: %s\n", message, e)
 }
 
 func Fatal(message string, e error) {
-	infoLogger.Fatalln(fmt.Sprintf("💣 %s: %s", message, e))
+	infoLogger.Fatalf("💣 %s: %s\n", message, e)
 }
 
 func trimMessage(message string) string {
@@ -78,7 +78,7 @@ func LogSymptoms(s symptoms.SymptomList) {
 
 		if s.Severity == "warning" {
 			if logWarningSymptoms {
-				Info(fmt.Sprintf("👀  %s", message))
+				Info(fmt.Sprintf("👀 %s", message))
 			}
 		} else if s.Severity == "critical" {
 			Info(fmt.Sprintf("❌ %s", message))
@@ -89,15 +89,30 @@ func LogSymptoms(s symptoms.SymptomList) {
 }
 
 func PrintBegin(resourceCount int, resourceType string) {
-	Info(fmt.Sprintf("== Checking %s resources", colorResourceTypeBold(resourceType)))
+	Info(fmt.Sprintf("== Checking %d %s resources", resourceCount, colorResourceTypeBold(resourceType)))
 }
 
-func PrintEnd(resourceCount int, resultCount int) {
+func PrintEnd(resourceCount int, symptomCounts [2]int) {
+	criticalCount := symptomCounts[0]
+	warningCount := symptomCounts[1]
+	totalSymptomCount := criticalCount + warningCount
+
 	if resourceCount == 0 {
 		Info("⭕️ No resources found")
 		return
 	}
-	if resultCount == 0 {
+
+	if totalSymptomCount == 0 {
 		Info("🎉 No symptoms found")
+		return
 	}
+
+	if (warningCount == 0 && criticalCount > 0) || logWarningSymptoms {
+		return
+	}
+
+	if criticalCount == 0 && warningCount > 0 && !logWarningSymptoms {
+		Info(fmt.Sprintf("👀 No critcal symptoms found but %d warning symptoms", warningCount))
+	}
+
 }

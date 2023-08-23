@@ -10,11 +10,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func DoCheckUp(cCtx *cli.Context) error {
+func DoCheckUp(cCtx *cli.Context) {
 	log.Setup(cCtx.Bool("debug"), cCtx.Bool("warning-symptoms"))
 	log.Debug(fmt.Sprintf("Connected to cluster from context %s running version %s", kubernetes.ContextName, kubernetes.ServerVersion))
 
-	checkNonNamespaced := cCtx.Bool("non-namespaced")
+	checkNonNamespaced := cCtx.Bool("non-namespaced-resources")
 	namespace := cCtx.String("namespace")
 	labelSelector := cCtx.String("label-selector")
 
@@ -22,7 +22,6 @@ func DoCheckUp(cCtx *cli.Context) error {
 		log.LogSymptoms(checkup.CheckNodes(kubernetes.GetNodes()))
 		log.LogSymptoms(checkup.CheckPersistentVolumes(kubernetes.GetPersistentVolumes()))
 		log.LogSymptoms(checkup.KubeApiHealthStatuses(kubernetes.GetKubeApiHealth()))
-		return nil
 	}
 
 	log.LogSymptoms(checkup.CheckDaemonSets(kubernetes.GetDaemonSets(namespace, metav1.ListOptions{LabelSelector: labelSelector})))
@@ -34,6 +33,4 @@ func DoCheckUp(cCtx *cli.Context) error {
 	log.LogSymptoms(checkup.CheckPersistentVolumeClaims(kubernetes.GetPersistentVolumeClaims(namespace, metav1.ListOptions{LabelSelector: labelSelector})))
 	log.LogSymptoms(checkup.CheckPods(kubernetes.GetPods(namespace, metav1.ListOptions{LabelSelector: labelSelector})))
 	log.LogSymptoms(checkup.CheckServices(kubernetes.GetServices(namespace, metav1.ListOptions{LabelSelector: labelSelector})))
-
-	return nil
 }

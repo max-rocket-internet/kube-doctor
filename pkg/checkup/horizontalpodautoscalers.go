@@ -29,7 +29,7 @@ func CheckHpas(resources *autoscaling.HorizontalPodAutoscalerList) (results symp
 		}
 	}
 
-	log.PrintEnd(len(resources.Items), len(results.Symptoms))
+	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
 
 	return results
 }

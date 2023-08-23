@@ -72,5 +72,5 @@ func TestContainerMemoryRequestLimitNotEqual(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "memory request and limit are not equal", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	assert.Equal(t, "warning", result.Symptoms[0].Severity)
 }

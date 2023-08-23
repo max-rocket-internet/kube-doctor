@@ -16,6 +16,18 @@ func (l *SymptomList) Add(s Symptom) {
 	l.Symptoms = append(l.Symptoms, s)
 }
 
+func (l *SymptomList) CountSymptomsSeverity() (c [2]int) {
+	for _, s := range l.Symptoms {
+		if s.Severity == "critical" {
+			c[0]++
+		} else {
+			c[1]++
+		}
+	}
+
+	return c
+}
+
 type ContainerSymptom struct {
 	Name     string
 	Severity string `validate:"oneof=warning critical"`

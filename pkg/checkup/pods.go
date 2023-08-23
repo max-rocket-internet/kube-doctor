@@ -18,7 +18,7 @@ func CheckPods(resources *v1.PodList) (results symptoms.SymptomList) {
 		log.Debug(fmt.Sprintf("Examining Pod %s/%s", pod.Namespace, pod.Name))
 
 		if pod.Status.Phase == "Succeeded" {
-			return
+			continue
 		}
 
 		if pod.Status.Phase != "Running" {
@@ -45,9 +45,9 @@ func CheckPods(resources *v1.PodList) (results symptoms.SymptomList) {
 
 		for _, scs := range pod.Status.ContainerStatuses {
 			if !scs.Ready {
-				if time.Now().Sub(pod.Status.StartTime.Time).Minutes() < 3 {
+				if time.Since(pod.Status.StartTime.Time).Minutes() < 3 {
 					results.Add(symptoms.Symptom{
-						Message:      fmt.Sprintf("container '%s' is not ready but pod started %.1f mins ago", scs.Name, pod.Status.StartTime.Sub(time.Now()).Minutes()),
+						Message:      fmt.Sprintf("container '%s' is not ready but pod started %.1f mins ago", scs.Name, time.Since(pod.Status.StartTime.Time).Minutes()),
 						Severity:     "warning",
 						ResourceName: pod.Name,
 						ResourceType: resourceType,
@@ -65,7 +65,7 @@ func CheckPods(resources *v1.PodList) (results symptoms.SymptomList) {
 			}
 
 			if scs.RestartCount != 0 {
-				if time.Now().Sub(scs.LastTerminationState.Terminated.FinishedAt.Time).Hours() > 1 {
+				if time.Since(scs.LastTerminationState.Terminated.FinishedAt.Time).Hours() > 1 {
 					results.Add(symptoms.Symptom{
 						Message:      fmt.Sprintf("container '%s' has been restarted %d times", scs.Name, scs.RestartCount),
 						Severity:     "warning",
@@ -77,7 +77,7 @@ func CheckPods(resources *v1.PodList) (results symptoms.SymptomList) {
 					results.Add(symptoms.Symptom{
 						Message: fmt.Sprintf("container '%s' was restarted %.1f mins ago: %d (exit code) %s (reason)",
 							scs.Name,
-							scs.LastTerminationState.Terminated.FinishedAt.Sub(time.Now()).Minutes(),
+							time.Since(scs.LastTerminationState.Terminated.FinishedAt.Time).Minutes(),
 							scs.LastTerminationState.Terminated.ExitCode,
 							scs.LastTerminationState.Terminated.Reason,
 						),
@@ -101,7 +101,7 @@ func CheckPods(resources *v1.PodList) (results symptoms.SymptomList) {
 		}
 	}
 
-	log.PrintEnd(len(resources.Items), len(results.Symptoms))
+	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
 
 	return results
 }

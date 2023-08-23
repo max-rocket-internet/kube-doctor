@@ -41,7 +41,7 @@ func CheckDeployments(resources *appsv1.DeploymentList) (results symptoms.Sympto
 				})
 			}
 			if condition.Reason == "ReplicaSetUpdated" && condition.Type == "Progressing" {
-				if time.Now().Sub(condition.LastUpdateTime.Time).Minutes() > 10 {
+				if time.Since(condition.LastUpdateTime.Time).Minutes() > 10 {
 					results.Add(symptoms.Symptom{
 						Message:      "ReplicaSet update in progress but no progress for 10 minutes or longer",
 						Severity:     "critical",
@@ -72,7 +72,7 @@ func CheckDeployments(resources *appsv1.DeploymentList) (results symptoms.Sympto
 		}
 	}
 
-	log.PrintEnd(len(resources.Items), len(results.Symptoms))
+	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
 
 	return results
 }
