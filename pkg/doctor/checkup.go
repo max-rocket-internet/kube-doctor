@@ -22,7 +22,6 @@ func DoCheckUp(cCtx *cli.Context) {
 		log.LogSymptoms(checkup.CheckNodes(kubernetes.GetNodes()))
 		log.LogSymptoms(checkup.CheckPersistentVolumes(kubernetes.GetPersistentVolumes()))
 		log.LogSymptoms(checkup.KubeApiHealthStatuses(kubernetes.GetKubeApiHealth()))
-		return
 	}
 
 	log.LogSymptoms(checkup.CheckDaemonSets(kubernetes.GetDaemonSets(namespace, metav1.ListOptions{LabelSelector: labelSelector})))

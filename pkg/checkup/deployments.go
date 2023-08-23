@@ -72,7 +72,7 @@ func CheckDeployments(resources *appsv1.DeploymentList) (results symptoms.Sympto
 		}
 	}
 
-	log.PrintEnd(len(resources.Items), len(results.Symptoms))
+	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
 
 	return results
 }

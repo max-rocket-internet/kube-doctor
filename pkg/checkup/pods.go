@@ -18,7 +18,7 @@ func CheckPods(resources *v1.PodList) (results symptoms.SymptomList) {
 		log.Debug(fmt.Sprintf("Examining Pod %s/%s", pod.Namespace, pod.Name))
 
 		if pod.Status.Phase == "Succeeded" {
-			return
+			continue
 		}
 
 		if pod.Status.Phase != "Running" {
@@ -101,7 +101,7 @@ func CheckPods(resources *v1.PodList) (results symptoms.SymptomList) {
 		}
 	}
 
-	log.PrintEnd(len(resources.Items), len(results.Symptoms))
+	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
 
 	return results
 }

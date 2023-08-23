@@ -62,5 +62,7 @@ func CheckEvents(resources *v1.EventList) (results symptoms.SymptomList) {
 		}
 	}
 
+	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
+
 	return results
 }

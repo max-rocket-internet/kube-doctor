@@ -27,7 +27,7 @@ func CheckPersistentVolumeClaims(resources *v1.PersistentVolumeClaimList) (resul
 		}
 	}
 
-	log.PrintEnd(len(resources.Items), len(results.Symptoms))
+	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
 
 	return results
 }

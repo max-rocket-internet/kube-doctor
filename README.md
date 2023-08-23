@@ -109,7 +109,7 @@ Or a combination of both:
 kube-doctor --label-selector app.kubernetes.io/name=prometheus --namespace monitoring
 ```
 
-Non-namespaced resources are checked separately and can be enalbed with the `--non-namespaced-resources` flag:
+Non-namespaced resources like nodes can be checked with the `--non-namespaced-resources` flag:
 
 ```shell
 kube-doctor --non-namespaced-resources

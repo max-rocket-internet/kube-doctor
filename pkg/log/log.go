@@ -89,15 +89,30 @@ func LogSymptoms(s symptoms.SymptomList) {
 }
 
 func PrintBegin(resourceCount int, resourceType string) {
-	Info(fmt.Sprintf("== Checking %s resources", colorResourceTypeBold(resourceType)))
+	Info(fmt.Sprintf("== Checking %d %s resources", resourceCount, colorResourceTypeBold(resourceType)))
 }
 
-func PrintEnd(resourceCount int, resultCount int) {
+func PrintEnd(resourceCount int, symptomCounts [2]int) {
+	criticalCount := symptomCounts[0]
+	warningCount := symptomCounts[1]
+	totalSymptomCount := criticalCount + warningCount
+
 	if resourceCount == 0 {
 		Info("⭕️ No resources found")
 		return
 	}
-	if resultCount == 0 {
+
+	if totalSymptomCount == 0 {
 		Info("🎉 No symptoms found")
+		return
 	}
+
+	if (warningCount == 0 && criticalCount > 0) || logWarningSymptoms {
+		return
+	}
+
+	if criticalCount == 0 && warningCount > 0 && !logWarningSymptoms {
+		Info(fmt.Sprintf("👀 No critcal symptoms found but %d warning symptoms", warningCount))
+	}
+
 }

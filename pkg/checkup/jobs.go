@@ -39,7 +39,7 @@ func CheckJobs(resources *batchv1.JobList) (results symptoms.SymptomList) {
 		}
 	}
 
-	log.PrintEnd(len(resources.Items), len(results.Symptoms))
+	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
 
 	return results
 }

@@ -59,7 +59,7 @@ func CheckDaemonSets(resources *v1.DaemonSetList) (results symptoms.SymptomList)
 		}
 	}
 
-	log.PrintEnd(len(resources.Items), len(results.Symptoms))
+	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
 
 	return results
 }
