@@ -101,7 +101,7 @@ func TestCheckPodsBadContainerStatuses(t *testing.T) {
 	result := CheckPods(&dummyResources)
 
 	assert.Len(t, result.Symptoms, 1)
-	assert.Equal(t, "container 'c1' is not ready but pod started 0.0 mins ago", result.Symptoms[0].Message)
+	assert.Equal(t, "container 'c1' is not ready but pod started -0.0 mins ago", result.Symptoms[0].Message)
 	assert.Equal(t, "warning", result.Symptoms[0].Severity)
 }
 
