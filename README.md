@@ -7,7 +7,7 @@
 
 Is your Kubernetes cluster unhealthy? Do your workloads have symptoms? Then maybe it needs a checkup with `kube-doctor` 🏥
 
-```shell
+```console
 $ kube-doctor --warning-symptoms --non-namespaced-resources
 == Checking DaemonSet resources
 👀 DaemonSet kube-system/efs-csi-node: efs-plugin no resources specified
@@ -93,31 +93,31 @@ This tool will check for the following symptoms:
 
 By default `kube-doctor` will check all namespaces but it can also target a specific namespace:
 
-```shell
+```console
 kube-doctor --namespace kube-system
 ```
 
 Or label selector;:
 
-```shell
+```console
 kube-doctor --label-selector app.kubernetes.io/name=prometheus
 ```
 
 Or a combination of both:
 
-```shell
+```console
 kube-doctor --label-selector app.kubernetes.io/name=prometheus --namespace monitoring
 ```
 
 Non-namespaced resources like nodes can be checked with the `--non-namespaced-resources` flag:
 
-```shell
+```console
 kube-doctor --non-namespaced-resources
 ```
 
 To see other options, including debug logging, consult the help:
 
-```shell
+```console
 kube-doctor --help
 ```
 
@@ -125,7 +125,7 @@ kube-doctor --help
 
 Check out code and build:
 
-```shell
+```console
 git clone git@github.com:max-rocket-internet/kube-doctor.git
 cd kube-doctor
 go build ./... && go install ./...
@@ -133,13 +133,13 @@ go build ./... && go install ./...
 
 Run from `main` branch without `git`:
 
-```shell
+```console
 go install github.com/max-rocket-internet/kube-doctor@latest
 cd $GOPATH/pkg/mod/github.com/max-rocket-internet/kube-doctor*/
 go run main.go
 ```
 
-To get a binary, check [the releases](https://github.com/max-rocket-internet/kube-doctor/releases).
+To download a binary, check [the releases](https://github.com/max-rocket-internet/kube-doctor/releases).
 
 ## Contributing
 
@@ -147,12 +147,12 @@ Pull requests welcome 💙
 
 To run all tests:
 
-```shell
+```console
 go test ./...
 ```
 
 Or just a single package:
 
-```shell
+```console
 go test ./.../checkup
 ```
