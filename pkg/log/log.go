@@ -49,11 +49,11 @@ func Info(message string) {
 }
 
 func Error(message string, e error) {
-	infoLogger.Println(fmt.Sprintf("❗ %s: %s", message, e))
+	infoLogger.Printf("❗ %s: %s\n", message, e)
 }
 
 func Fatal(message string, e error) {
-	infoLogger.Fatalln(fmt.Sprintf("💣 %s: %s", message, e))
+	infoLogger.Fatalf("💣 %s: %s\n", message, e)
 }
 
 func trimMessage(message string) string {

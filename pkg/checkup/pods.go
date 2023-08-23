@@ -47,7 +47,7 @@ func CheckPods(resources *v1.PodList) (results symptoms.SymptomList) {
 			if !scs.Ready {
 				if time.Since(pod.Status.StartTime.Time).Minutes() < 3 {
 					results.Add(symptoms.Symptom{
-						Message:      fmt.Sprintf("container '%s' is not ready but pod started %.1f mins ago", scs.Name, pod.Status.StartTime.Sub(time.Now()).Minutes()),
+						Message:      fmt.Sprintf("container '%s' is not ready but pod started %.1f mins ago", scs.Name, time.Since(pod.Status.StartTime.Time).Minutes()),
 						Severity:     "warning",
 						ResourceName: pod.Name,
 						ResourceType: resourceType,
