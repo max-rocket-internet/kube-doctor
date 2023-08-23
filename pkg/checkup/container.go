@@ -33,7 +33,7 @@ func checkContainer(container v1.Container) (results symptoms.ContainerSymptomLi
 		results.Add(symptoms.ContainerSymptom{
 			Name:     container.Name,
 			Message:  "memory request and limit are not equal",
-			Severity: "critical",
+			Severity: "warning",
 		})
 	}
 

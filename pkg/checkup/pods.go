@@ -77,7 +77,7 @@ func CheckPods(resources *v1.PodList) (results symptoms.SymptomList) {
 					results.Add(symptoms.Symptom{
 						Message: fmt.Sprintf("container '%s' was restarted %.1f mins ago: %d (exit code) %s (reason)",
 							scs.Name,
-							scs.LastTerminationState.Terminated.FinishedAt.Sub(time.Now()).Minutes(),
+							time.Now().Sub(scs.LastTerminationState.Terminated.FinishedAt.Time).Minutes(),
 							scs.LastTerminationState.Terminated.ExitCode,
 							scs.LastTerminationState.Terminated.Reason,
 						),

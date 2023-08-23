@@ -19,7 +19,7 @@ var (
 	colorResourceName      = color.New(color.FgBlue, color.Bold).SprintFunc()
 	colorResourceNamespace = color.New(color.FgGreen).SprintFunc()
 	colorDebug             = color.New(color.Faint).SprintFunc()
-	messageCharacterLimit  = 100
+	messageCharacterLimit  = 120
 )
 
 func init() {
@@ -78,7 +78,7 @@ func LogSymptoms(s symptoms.SymptomList) {
 
 		if s.Severity == "warning" {
 			if logWarningSymptoms {
-				Info(fmt.Sprintf("👀  %s", message))
+				Info(fmt.Sprintf("👀 %s", message))
 			}
 		} else if s.Severity == "critical" {
 			Info(fmt.Sprintf("❌ %s", message))

@@ -14,7 +14,7 @@ func DoCheckUp(cCtx *cli.Context) error {
 	log.Setup(cCtx.Bool("debug"), cCtx.Bool("warning-symptoms"))
 	log.Debug(fmt.Sprintf("Connected to cluster from context %s running version %s", kubernetes.ContextName, kubernetes.ServerVersion))
 
-	checkNonNamespaced := cCtx.Bool("non-namespaced")
+	checkNonNamespaced := cCtx.Bool("non-namespaced-resources")
 	namespace := cCtx.String("namespace")
 	labelSelector := cCtx.String("label-selector")
 
