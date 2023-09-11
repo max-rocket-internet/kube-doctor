@@ -224,6 +224,45 @@ func TestCheckPodsWithRestarts(t *testing.T) {
 	assert.Equal(t, "critical", result.Symptoms[0].Severity)
 }
 
+func TestCheckPodsWithRestartsAndRunning(t *testing.T) {
+	dummyResources := v1.PodList{
+		Items: []v1.Pod{
+			{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "test",
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							Kind: "Deployment",
+						},
+					},
+				},
+				Status: v1.PodStatus{
+					StartTime:  createNewTimeStampPtr(time.Now()),
+					Phase:      "Running",
+					Conditions: []v1.PodCondition{},
+					ContainerStatuses: []v1.ContainerStatus{
+						{
+							Ready:        true,
+							Name:         "c1",
+							RestartCount: 1,
+							State: v1.ContainerState{
+								Terminated: &v1.ContainerStateTerminated{
+									ExitCode: 0,
+									Reason:   "Completed",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	result := CheckPods(&dummyResources)
+
+	assert.Len(t, result.Symptoms, 0)
+}
+
 func TestCheckPodsNoOwner(t *testing.T) {
 	dummyResources := v1.PodList{
 		Items: []v1.Pod{
