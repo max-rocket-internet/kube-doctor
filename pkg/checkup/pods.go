@@ -64,7 +64,7 @@ func CheckPods(resources *v1.PodList) (results symptoms.SymptomList) {
 				}
 			}
 
-			if scs.RestartCount != 0 {
+			if scs.RestartCount > 0 && scs.LastTerminationState.Terminated != nil {
 				if time.Since(scs.LastTerminationState.Terminated.FinishedAt.Time).Hours() > 1 {
 					results.Add(symptoms.Symptom{
 						Message:      fmt.Sprintf("container '%s' has been restarted %d times", scs.Name, scs.RestartCount),
