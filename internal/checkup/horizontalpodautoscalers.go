@@ -3,8 +3,8 @@ package checkup
 import (
 	"fmt"
 
-	"github.com/max-rocket-internet/kube-doctor/pkg/checkup/symptoms"
-	"github.com/max-rocket-internet/kube-doctor/pkg/log"
+	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
+	"github.com/max-rocket-internet/kube-doctor/internal/log"
 	autoscaling "k8s.io/api/autoscaling/v2"
 )
 

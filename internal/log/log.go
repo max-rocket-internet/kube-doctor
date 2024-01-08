@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/fatih/color"
-	"github.com/max-rocket-internet/kube-doctor/pkg/checkup/symptoms"
+	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
 )
 
 var (
