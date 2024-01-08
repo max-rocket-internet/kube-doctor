@@ -5,8 +5,8 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 
-	"github.com/max-rocket-internet/kube-doctor/pkg/checkup/symptoms"
-	"github.com/max-rocket-internet/kube-doctor/pkg/log"
+	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
+	"github.com/max-rocket-internet/kube-doctor/internal/log"
 )
 
 func CheckEndpoints(resources *v1.EndpointsList) (results symptoms.SymptomList) {

@@ -3,9 +3,9 @@ package doctor
 import (
 	"fmt"
 
-	"github.com/max-rocket-internet/kube-doctor/pkg/checkup"
-	"github.com/max-rocket-internet/kube-doctor/pkg/kubernetes"
-	"github.com/max-rocket-internet/kube-doctor/pkg/log"
+	"github.com/max-rocket-internet/kube-doctor/internal/checkup"
+	"github.com/max-rocket-internet/kube-doctor/internal/kubernetes"
+	"github.com/max-rocket-internet/kube-doctor/internal/log"
 	"github.com/urfave/cli/v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

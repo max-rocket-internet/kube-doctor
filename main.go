@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/max-rocket-internet/kube-doctor/pkg/doctor"
+	"github.com/max-rocket-internet/kube-doctor/internal/doctor"
 	"github.com/urfave/cli/v2"
 )
 

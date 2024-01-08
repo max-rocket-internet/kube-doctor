@@ -13,8 +13,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/max-rocket-internet/kube-doctor/pkg/kubernetes/statuses"
-	"github.com/max-rocket-internet/kube-doctor/pkg/log"
+	"github.com/max-rocket-internet/kube-doctor/internal/kubernetes/statuses"
+	"github.com/max-rocket-internet/kube-doctor/internal/log"
 )
 
 var (

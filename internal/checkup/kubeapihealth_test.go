@@ -3,7 +3,7 @@ package checkup
 import (
 	"testing"
 
-	"github.com/max-rocket-internet/kube-doctor/pkg/kubernetes/statuses"
+	"github.com/max-rocket-internet/kube-doctor/internal/kubernetes/statuses"
 	"github.com/stretchr/testify/assert"
 )
 
