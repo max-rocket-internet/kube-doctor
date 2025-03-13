@@ -1,6 +1,6 @@
 module github.com/max-rocket-internet/kube-doctor
 
-go 1.23.3
+go 1.23
 
 require (
 	github.com/fatih/color v1.15.0
