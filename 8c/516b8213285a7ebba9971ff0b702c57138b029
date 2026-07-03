@@ -1,0 +1,27 @@
+internal/checkup/endpoints.go
+  s_e9dd9e11df4068::t_3f19dd044d395b 28,30,36,38
+internal/checkup/horizontalpodautoscalers.go
+  s_e9dd9e11df4068::t_03a9b21e721338 24,26
+internal/checkup/services.go
+  s_e9dd9e11df4068::t_aeeceb0cd315ba 24,26
+internal/kubernetes/kubernetes.go
+  s_e9dd9e11df4068::t_3bb048160f788c 48
+internal/log/log.go
+  s_e9dd9e11df4068::t_c788985f3a09c8 79-80,84,86
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "8c516b8213285a7ebba9971ff0b702c57138b029",
+  "prompts": {},
+  "sessions": {
+    "s_e9dd9e11df4068": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d903145c-e8d3-4ee4-b519-e75338b6fb7e",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Max Williams <max-rocket-internet@users.noreply.github.com>"
+    }
+  }
+}
