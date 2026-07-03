@@ -45,7 +45,7 @@ func createClient() *kubernetes.Clientset {
 		log.Fatal("error creating kubernetes client", err)
 	}
 
-	ver, err := client.DiscoveryClient.ServerVersion()
+	ver, err := client.ServerVersion()
 	if err != nil {
 		log.Fatal("error getting kubernetes version", err)
 	}
