@@ -21,9 +21,9 @@ func CheckServices(resources *v1.ServiceList) (results symptoms.SymptomList) {
 				results.Add(symptoms.Symptom{
 					Message:      "LoadBalancer service has no ingress points",
 					Severity:     "critical",
-					ResourceName: service.ObjectMeta.Name,
+					ResourceName: service.Name,
 					ResourceType: resourceType,
-					Namespace:    service.ObjectMeta.Namespace,
+					Namespace:    service.Namespace,
 				})
 			}
 		}

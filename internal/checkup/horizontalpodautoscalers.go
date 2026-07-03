@@ -21,9 +21,9 @@ func CheckHpas(resources *autoscaling.HorizontalPodAutoscalerList) (results symp
 				results.Add(symptoms.Symptom{
 					Message:      fmt.Sprintf("has condition %s=%s and reason %s", condition.Type, condition.Status, condition.Reason),
 					Severity:     "warning",
-					ResourceName: hpa.ObjectMeta.Name,
+					ResourceName: hpa.Name,
 					ResourceType: resourceType,
-					Namespace:    hpa.ObjectMeta.Namespace,
+					Namespace:    hpa.Namespace,
 				})
 			}
 		}

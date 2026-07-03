@@ -76,13 +76,14 @@ func LogSymptoms(s symptoms.SymptomList) {
 			message = fmt.Sprintf("%s %s/%s: %s", colorResourceType(s.ResourceType), colorResourceNamespace(s.Namespace), colorResourceName(s.ResourceName), trimMessage(s.Message))
 		}
 
-		if s.Severity == "warning" {
+		switch s.Severity {
+		case "warning":
 			if logWarningSymptoms {
 				Info(fmt.Sprintf("👀 %s", message))
 			}
-		} else if s.Severity == "critical" {
+		case "critical":
 			Info(fmt.Sprintf("❌ %s", message))
-		} else {
+		default:
 			Error(fmt.Sprintf("unknown symptom severity: %s", s.Severity), nil)
 		}
 	}

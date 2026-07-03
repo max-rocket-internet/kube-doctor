@@ -25,17 +25,17 @@ func CheckEndpoints(resources *v1.EndpointsList) (results symptoms.SymptomList) 
 				results.Add(symptoms.Symptom{
 					Message:      "no ready addresses in subsets",
 					Severity:     "critical",
-					ResourceName: endpoint.ObjectMeta.Name,
+					ResourceName: endpoint.Name,
 					ResourceType: resourceType,
-					Namespace:    endpoint.ObjectMeta.Namespace,
+					Namespace:    endpoint.Namespace,
 				})
 			} else if len(s.NotReadyAddresses) > 0 {
 				results.Add(symptoms.Symptom{
 					Message:      fmt.Sprintf("%d/%d addresses in subsets are NotReady", notReadyAddressCount, notReadyAddressCount+readyAddressCount),
 					Severity:     "warning",
-					ResourceName: endpoint.ObjectMeta.Name,
+					ResourceName: endpoint.Name,
 					ResourceType: resourceType,
-					Namespace:    endpoint.ObjectMeta.Namespace,
+					Namespace:    endpoint.Namespace,
 				})
 			}
 		}
