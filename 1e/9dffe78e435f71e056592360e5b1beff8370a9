@@ -1,0 +1,27 @@
+.github/workflows/test.yaml
+  s_e9dd9e11df4068::t_600364035df197 14
+  s_e9dd9e11df4068::t_3e159540a6ee85 10,12
+.github/workflows/fmt.yaml
+  s_e9dd9e11df4068::t_c97ef3193830e9 19-20
+  s_e9dd9e11df4068::t_940fbf89b20c1b 22
+  s_e9dd9e11df4068::t_d3bf17cfdd1ae3 27
+go.mod
+  s_e9dd9e11df4068::t_6b24afc6346050 3,5
+  s_e9dd9e11df4068::t_202e073e7284db 43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "1e9dffe78e435f71e056592360e5b1beff8370a9",
+  "prompts": {},
+  "sessions": {
+    "s_e9dd9e11df4068": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d903145c-e8d3-4ee4-b519-e75338b6fb7e",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Max Williams <max-rocket-internet@users.noreply.github.com>"
+    }
+  }
+}
