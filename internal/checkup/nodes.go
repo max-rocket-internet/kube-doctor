@@ -4,49 +4,49 @@ import (
 	"fmt"
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
+
 	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
 	"github.com/max-rocket-internet/kube-doctor/internal/log"
-
-	v1 "k8s.io/api/core/v1"
 )
 
-func CheckNodes(resources *v1.NodeList) (results symptoms.SymptomList) {
+// Nodes younger than this are allowed to be not Ready yet.
+const nodeStartupGracePeriod = 5 * time.Minute
+
+func CheckNodes(resources *corev1.NodeList) (results symptoms.SymptomList) {
+	const resourceType = "Node"
+
 	nodeVersions := make(map[string]int)
-	resourceType := "Node"
 
 	log.PrintBegin(len(resources.Items), resourceType)
 
 	for _, node := range resources.Items {
-		log.Debug(fmt.Sprintf("Examining Node %s", node.Name))
+		log.Debugf("Examining Node %s", node.Name)
+
+		add := func(severity symptoms.Severity, message string) {
+			results.Add(symptoms.Symptom{
+				Message:      message,
+				Severity:     severity,
+				ResourceName: node.Name,
+				ResourceType: resourceType,
+			})
+		}
 
 		nodeVersions[node.Status.NodeInfo.KubeletVersion]++
 
 		for _, condition := range node.Status.Conditions {
-			if condition.Type == "Ready" {
-				if condition.Status != "True" {
-					if time.Since(node.ObjectMeta.CreationTimestamp.Time).Minutes() > 5 {
-						results.Add(symptoms.Symptom{
-							Message:      "older than 5 minutes and not Ready",
-							Severity:     "critical",
-							ResourceName: node.Name,
-							ResourceType: resourceType,
-						})
-					} else {
-						results.Add(symptoms.Symptom{
-							Message:      "not ready",
-							Severity:     "warning",
-							ResourceName: node.Name,
-							ResourceType: resourceType,
-						})
-					}
+			switch {
+			case condition.Type == corev1.NodeReady:
+				if condition.Status == corev1.ConditionTrue {
+					continue
 				}
-			} else if condition.Status != "False" {
-				results.Add(symptoms.Symptom{
-					Message:      fmt.Sprintf("has condition %s=%s: %s", condition.Type, condition.Status, condition.Reason),
-					Severity:     "critical",
-					ResourceName: node.Name,
-					ResourceType: resourceType,
-				})
+				if time.Since(node.CreationTimestamp.Time) > nodeStartupGracePeriod {
+					add(symptoms.Critical, "older than 5 minutes and not Ready")
+				} else {
+					add(symptoms.Warning, "not ready")
+				}
+			case condition.Status != corev1.ConditionFalse:
+				add(symptoms.Critical, fmt.Sprintf("has condition %s=%s: %s", condition.Type, condition.Status, condition.Reason))
 			}
 		}
 	}
@@ -54,12 +54,12 @@ func CheckNodes(resources *v1.NodeList) (results symptoms.SymptomList) {
 	if len(nodeVersions) > 1 {
 		results.Add(symptoms.Symptom{
 			Message:      "multiple node versions running",
-			Severity:     "critical",
+			Severity:     symptoms.Critical,
 			ResourceType: resourceType,
 		})
 	}
 
-	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
+	log.PrintEnd(len(resources.Items), results.Count())
 
 	return results
 }

@@ -4,62 +4,79 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	v1 "k8s.io/api/core/v1"
+	discoveryv1 "k8s.io/api/discovery/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
 )
 
-func TestEndpointNoReadyAdresses(t *testing.T) {
-	dummyResources := v1.EndpointsList{
-		Items: []v1.Endpoints{
-			{
-				Subsets: []v1.EndpointSubset{
-					{
-						Addresses: []v1.EndpointAddress{},
-						NotReadyAddresses: []v1.EndpointAddress{
-							{
-								IP: "10.0.0.3",
-							},
-						},
-					},
-				},
-			},
+func endpointSlice(service string, ready ...bool) discoveryv1.EndpointSlice {
+	slice := discoveryv1.EndpointSlice{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      service + "-abcde",
+			Namespace: "default",
+			Labels:    map[string]string{discoveryv1.LabelServiceName: service},
 		},
 	}
-
-	result := CheckEndpoints(&dummyResources)
-
-	assert.Len(t, result.Symptoms, 1)
-	assert.Equal(t, "no ready addresses in subsets", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	for _, r := range ready {
+		slice.Endpoints = append(slice.Endpoints, discoveryv1.Endpoint{
+			Conditions: discoveryv1.EndpointConditions{Ready: new(r)},
+		})
+	}
+	return slice
 }
 
-func TestEndpointSomeNotReadyAddresses(t *testing.T) {
-	dummyResources := v1.EndpointsList{
-		Items: []v1.Endpoints{
-			{
-				Subsets: []v1.EndpointSubset{
-					{
-						Addresses: []v1.EndpointAddress{
-							{
-								IP: "10.0.0.1",
-							},
-							{
-								IP: "10.0.0.2",
-							},
-						},
-						NotReadyAddresses: []v1.EndpointAddress{
-							{
-								IP: "10.0.0.3",
-							},
-						},
-					},
-				},
-			},
+func TestEndpointSlices(t *testing.T) {
+	tests := []struct {
+		name         string
+		slices       []discoveryv1.EndpointSlice
+		wantMessage  string
+		wantSeverity symptoms.Severity
+	}{
+		{
+			name:         "no ready endpoints",
+			slices:       []discoveryv1.EndpointSlice{endpointSlice("app", false)},
+			wantMessage:  "no ready endpoints",
+			wantSeverity: symptoms.Critical,
+		},
+		{
+			name:         "some endpoints not ready",
+			slices:       []discoveryv1.EndpointSlice{endpointSlice("app", true, true, false)},
+			wantMessage:  "1/3 endpoints are not ready",
+			wantSeverity: symptoms.Warning,
+		},
+		{
+			name:         "aggregated across slices of one service",
+			slices:       []discoveryv1.EndpointSlice{endpointSlice("app", false), endpointSlice("app", true)},
+			wantMessage:  "1/2 endpoints are not ready",
+			wantSeverity: symptoms.Warning,
 		},
 	}
 
-	result := CheckEndpoints(&dummyResources)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := CheckEndpointSlices(&discoveryv1.EndpointSliceList{Items: tt.slices})
 
-	assert.Len(t, result.Symptoms, 1)
-	assert.Equal(t, "1/3 addresses in subsets are NotReady", result.Symptoms[0].Message)
-	assert.Equal(t, "warning", result.Symptoms[0].Severity)
+			assert.Len(t, result.Symptoms, 1)
+			assert.Equal(t, "app", result.Symptoms[0].ResourceName)
+			assert.Equal(t, tt.wantMessage, result.Symptoms[0].Message)
+			assert.Equal(t, tt.wantSeverity, result.Symptoms[0].Severity)
+		})
+	}
+}
+
+func TestEndpointSlicesHealthy(t *testing.T) {
+	terminating := endpointSlice("app", true)
+	terminating.Endpoints = append(terminating.Endpoints, discoveryv1.Endpoint{
+		Conditions: discoveryv1.EndpointConditions{Ready: new(false), Terminating: new(true)},
+	})
+
+	resources := discoveryv1.EndpointSliceList{Items: []discoveryv1.EndpointSlice{
+		endpointSlice("ready", true, true),
+		endpointSlice("empty"),
+		{Endpoints: []discoveryv1.Endpoint{{}}}, // nil Ready means ready
+		terminating,
+	}}
+
+	assert.Empty(t, CheckEndpointSlices(&resources).Symptoms)
 }

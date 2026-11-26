@@ -4,21 +4,25 @@ import (
 	"fmt"
 	"time"
 
+	batchv1 "k8s.io/api/batch/v1"
+	corev1 "k8s.io/api/core/v1"
+
 	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
 	"github.com/max-rocket-internet/kube-doctor/internal/log"
-	batchv1 "k8s.io/api/batch/v1"
 )
 
+// Jobs that completed longer ago than this are ignored.
+const jobMaxAge = time.Hour
+
 func CheckJobs(resources *batchv1.JobList) (results symptoms.SymptomList) {
-	resourceType := "Job"
+	const resourceType = "Job"
 
 	log.PrintBegin(len(resources.Items), resourceType)
 
 	for _, job := range resources.Items {
-		log.Debug(fmt.Sprintf("Examining Job %s/%s", job.Namespace, job.Name))
+		log.Debugf("Examining Job %s/%s", job.Namespace, job.Name)
 
-		// Ignore jobs older than 1 hour
-		if job.Status.CompletionTime != nil && time.Since(job.Status.CompletionTime.Time).Minutes() > 60 {
+		if job.Status.CompletionTime != nil && time.Since(job.Status.CompletionTime.Time) > jobMaxAge {
 			continue
 		}
 
@@ -27,10 +31,10 @@ func CheckJobs(resources *batchv1.JobList) (results symptoms.SymptomList) {
 		}
 
 		for _, condition := range job.Status.Conditions {
-			if condition.Type == "Failed" && condition.Status == "True" {
+			if condition.Type == batchv1.JobFailed && condition.Status == corev1.ConditionTrue {
 				results.Add(symptoms.Symptom{
 					Message:      fmt.Sprintf("%s: %s", condition.Reason, condition.Message),
-					Severity:     "critical",
+					Severity:     symptoms.Critical,
 					ResourceName: job.Name,
 					ResourceType: resourceType,
 					Namespace:    job.Namespace,
@@ -39,7 +43,7 @@ func CheckJobs(resources *batchv1.JobList) (results symptoms.SymptomList) {
 		}
 	}
 
-	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
+	log.PrintEnd(len(resources.Items), results.Count())
 
 	return results
 }

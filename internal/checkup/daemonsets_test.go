@@ -5,6 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/apps/v1"
+
+	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
 )
 
 func TestDaemonSetPodsNotReady(t *testing.T) {
@@ -24,7 +26,7 @@ func TestDaemonSetPodsNotReady(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "1/4 pods are not ready", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Critical, result.Symptoms[0].Severity)
 }
 
 func TestDaemonSetMisscheduled(t *testing.T) {
@@ -43,8 +45,8 @@ func TestDaemonSetMisscheduled(t *testing.T) {
 	result := CheckDaemonSets(&dummyResources)
 
 	assert.Len(t, result.Symptoms, 1)
-	assert.Equal(t, "1/4 pods are miss scheduled", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	assert.Equal(t, "1/4 pods are misscheduled", result.Symptoms[0].Message)
+	assert.Equal(t, symptoms.Critical, result.Symptoms[0].Severity)
 }
 
 func TestDaemonSetRollingUpdateInProgress(t *testing.T) {
@@ -63,5 +65,5 @@ func TestDaemonSetRollingUpdateInProgress(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "rolling update in progress", result.Symptoms[0].Message)
-	assert.Equal(t, "warning", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Warning, result.Symptoms[0].Severity)
 }

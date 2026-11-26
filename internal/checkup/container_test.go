@@ -6,6 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+
+	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
 )
 
 func TestContainerNoResources(t *testing.T) {
@@ -18,7 +20,7 @@ func TestContainerNoResources(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "no resources specified", result.Symptoms[0].Message)
-	assert.Equal(t, "warning", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Warning, result.Symptoms[0].Severity)
 }
 
 func TestContainerNoMemoryResources(t *testing.T) {
@@ -33,7 +35,7 @@ func TestContainerNoMemoryResources(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "no memory resources specified", result.Symptoms[0].Message)
-	assert.Equal(t, "warning", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Warning, result.Symptoms[0].Severity)
 }
 
 func TestContainerNoMemoryLimit(t *testing.T) {
@@ -51,7 +53,7 @@ func TestContainerNoMemoryLimit(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "no memory limit", result.Symptoms[0].Message)
-	assert.Equal(t, "warning", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Warning, result.Symptoms[0].Severity)
 }
 
 func TestContainerMemoryRequestLimitNotEqual(t *testing.T) {
@@ -72,5 +74,5 @@ func TestContainerMemoryRequestLimitNotEqual(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "memory request and limit are not equal", result.Symptoms[0].Message)
-	assert.Equal(t, "warning", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Warning, result.Symptoms[0].Severity)
 }

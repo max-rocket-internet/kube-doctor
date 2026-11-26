@@ -6,9 +6,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	autoscaling "k8s.io/api/autoscaling/v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
 )
 
-func TestCheckHpasUknown(t *testing.T) {
+func TestCheckHPAsUknown(t *testing.T) {
 	dummyResources := autoscaling.HorizontalPodAutoscalerList{
 		Items: []autoscaling.HorizontalPodAutoscaler{
 			{
@@ -29,14 +31,14 @@ func TestCheckHpasUknown(t *testing.T) {
 		},
 	}
 
-	result := CheckHpas(&dummyResources)
+	result := CheckHPAs(&dummyResources)
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "has condition AbleToScale=Unknown and reason SomeReason", result.Symptoms[0].Message)
-	assert.Equal(t, "warning", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Warning, result.Symptoms[0].Severity)
 }
 
-func TestCheckHpasNotAbleToScale(t *testing.T) {
+func TestCheckHPAsNotAbleToScale(t *testing.T) {
 	dummyResources := autoscaling.HorizontalPodAutoscalerList{
 		Items: []autoscaling.HorizontalPodAutoscaler{
 			{
@@ -57,14 +59,14 @@ func TestCheckHpasNotAbleToScale(t *testing.T) {
 		},
 	}
 
-	result := CheckHpas(&dummyResources)
+	result := CheckHPAs(&dummyResources)
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "has condition AbleToScale=False and reason FailedGetScale", result.Symptoms[0].Message)
-	assert.Equal(t, "warning", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Warning, result.Symptoms[0].Severity)
 }
 
-func TestCheckHpasToBeIgnored(t *testing.T) {
+func TestCheckHPAsToBeIgnored(t *testing.T) {
 	dummyResources := autoscaling.HorizontalPodAutoscalerList{
 		Items: []autoscaling.HorizontalPodAutoscaler{
 			{
@@ -85,7 +87,7 @@ func TestCheckHpasToBeIgnored(t *testing.T) {
 		},
 	}
 
-	result := CheckHpas(&dummyResources)
+	result := CheckHPAs(&dummyResources)
 
 	assert.Len(t, result.Symptoms, 0)
 }

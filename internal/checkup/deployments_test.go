@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
 )
 
 func TestDeploymentConditionMinimumReplicasAvailable(t *testing.T) {
@@ -17,11 +19,11 @@ func TestDeploymentConditionMinimumReplicasAvailable(t *testing.T) {
 					Name: "test",
 				},
 				Spec: v1.DeploymentSpec{
-					Replicas: int32Ptr(1),
+					Replicas: new(int32(1)),
 				},
 				Status: v1.DeploymentStatus{
-					Replicas:      int32Literal(1),
-					ReadyReplicas: int32Literal(1),
+					Replicas:      1,
+					ReadyReplicas: 1,
 					Conditions: []v1.DeploymentCondition{
 						{
 							Status: "False",
@@ -37,7 +39,7 @@ func TestDeploymentConditionMinimumReplicasAvailable(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "minimum availability not met", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Critical, result.Symptoms[0].Severity)
 }
 
 func TestDeploymentConditionReplicaSetUpdated(t *testing.T) {
@@ -48,11 +50,11 @@ func TestDeploymentConditionReplicaSetUpdated(t *testing.T) {
 					Name: "test",
 				},
 				Spec: v1.DeploymentSpec{
-					Replicas: int32Ptr(1),
+					Replicas: new(int32(1)),
 				},
 				Status: v1.DeploymentStatus{
-					Replicas:      int32Literal(1),
-					ReadyReplicas: int32Literal(1),
+					Replicas:      1,
+					ReadyReplicas: 1,
 					Conditions: []v1.DeploymentCondition{
 						{
 							Reason:         "ReplicaSetUpdated",
@@ -69,7 +71,7 @@ func TestDeploymentConditionReplicaSetUpdated(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "ReplicaSet update in progress", result.Symptoms[0].Message)
-	assert.Equal(t, "warning", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Warning, result.Symptoms[0].Severity)
 }
 
 func TestDeploymentConditionReplicaSetUpdatedTooLong(t *testing.T) {
@@ -80,11 +82,11 @@ func TestDeploymentConditionReplicaSetUpdatedTooLong(t *testing.T) {
 					Name: "test",
 				},
 				Spec: v1.DeploymentSpec{
-					Replicas: int32Ptr(1),
+					Replicas: new(int32(1)),
 				},
 				Status: v1.DeploymentStatus{
-					Replicas:      int32Literal(1),
-					ReadyReplicas: int32Literal(1),
+					Replicas:      1,
+					ReadyReplicas: 1,
 					Conditions: []v1.DeploymentCondition{
 						{
 							Reason:         "ReplicaSetUpdated",
@@ -101,7 +103,7 @@ func TestDeploymentConditionReplicaSetUpdatedTooLong(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "ReplicaSet update in progress but no progress for 10 minutes or longer", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Critical, result.Symptoms[0].Severity)
 }
 
 func TestDeploymentPodsNotReady(t *testing.T) {
@@ -112,11 +114,11 @@ func TestDeploymentPodsNotReady(t *testing.T) {
 					Name: "test",
 				},
 				Spec: v1.DeploymentSpec{
-					Replicas: int32Ptr(3),
+					Replicas: new(int32(3)),
 				},
 				Status: v1.DeploymentStatus{
-					Replicas:      int32Literal(1),
-					ReadyReplicas: int32Literal(1),
+					Replicas:      1,
+					ReadyReplicas: 1,
 				},
 			},
 		},
@@ -126,5 +128,5 @@ func TestDeploymentPodsNotReady(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "2/3 pods are not ready", result.Symptoms[0].Message)
-	assert.Equal(t, "warning", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Warning, result.Symptoms[0].Severity)
 }
