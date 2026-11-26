@@ -1,54 +1,54 @@
+// Package statuses parses the verbose output of the Kubernetes API health endpoints.
 package statuses
 
-import (
-	"fmt"
-	"strings"
+import "strings"
+
+const (
+	StatusOK      = "ok"
+	StatusBad     = "bad"
+	StatusUnknown = "unknown"
 )
 
-type KubeApiHealthEndpointStatus struct {
+// KubeAPIHealthEndpointStatus is a single check reported by /readyz or /livez.
+type KubeAPIHealthEndpointStatus struct {
 	Name   string
 	Path   string
 	Status string
 }
 
-type KubeApiHealthEndpointStatusList struct {
-	Items []KubeApiHealthEndpointStatus
+// KubeAPIHealthEndpointStatusList is a collection of health endpoint checks.
+type KubeAPIHealthEndpointStatusList struct {
+	Items []KubeAPIHealthEndpointStatus
 }
 
-func getApiStatusName(line string) string {
-	trimmedLine := line[3:]
-	words := strings.Fields(trimmedLine)
-	wordCount := len(words)
-	return strings.Join(words[:wordCount-1], ",")
-}
-
-func (l *KubeApiHealthEndpointStatusList) Add(s KubeApiHealthEndpointStatus) {
+// Add appends s to the list.
+func (l *KubeAPIHealthEndpointStatusList) Add(s KubeAPIHealthEndpointStatus) {
 	l.Items = append(l.Items, s)
 }
 
-func (l *KubeApiHealthEndpointStatusList) AddRawLine(line string, path string) {
-	if len(path) == 0 || len(line) == 0 || line == fmt.Sprintf("%s check passed", path[1:]) {
+// AddRawLine parses one line of verbose health endpoint output, e.g.
+// "[+]etcd ok" or "[-]etcd failed: reason withheld", and adds it to the list.
+// Blank lines and the trailing "<path> check passed" summary are ignored.
+func (l *KubeAPIHealthEndpointStatusList) AddRawLine(line, path string) {
+	if path == "" || line == "" || line == strings.TrimPrefix(path, "/")+" check passed" {
 		return
 	}
 
-	var status string
-	var name string
-
-	switch line[0:3] {
-	case "[+]":
-		status = "ok"
-		name = getApiStatusName(line)
-	case "[-]":
-		status = "bad"
-		name = getApiStatusName(line)
-	default:
-		status = "unknown"
-		name = line
+	status, name := StatusUnknown, line
+	if rest, ok := strings.CutPrefix(line, "[+]"); ok {
+		status, name = StatusOK, checkName(rest)
+	} else if rest, ok := strings.CutPrefix(line, "[-]"); ok {
+		status, name = StatusBad, checkName(rest)
 	}
 
-	l.Add(KubeApiHealthEndpointStatus{
+	l.Add(KubeAPIHealthEndpointStatus{
 		Name:   name,
 		Path:   path,
 		Status: status,
 	})
+}
+
+func checkName(s string) string {
+	name, _, _ := strings.Cut(strings.TrimSpace(s), " ")
+	return name
 }

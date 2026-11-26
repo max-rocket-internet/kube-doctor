@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
 )
 
 func TestCheckPodsNotRunning(t *testing.T) {
@@ -22,7 +24,7 @@ func TestCheckPodsNotRunning(t *testing.T) {
 					},
 				},
 				Status: v1.PodStatus{
-					StartTime:  createNewTimeStampPtr(time.Now()),
+					StartTime:  new(metav1.NewTime(time.Now())),
 					Phase:      "Pending",
 					Conditions: []v1.PodCondition{},
 				},
@@ -34,7 +36,7 @@ func TestCheckPodsNotRunning(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "not running", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Critical, result.Symptoms[0].Severity)
 }
 
 func TestCheckPodsBadCondition(t *testing.T) {
@@ -50,7 +52,7 @@ func TestCheckPodsBadCondition(t *testing.T) {
 					},
 				},
 				Status: v1.PodStatus{
-					StartTime: createNewTimeStampPtr(time.Now()),
+					StartTime: new(metav1.NewTime(time.Now())),
 					Phase:     "Running",
 					Conditions: []v1.PodCondition{
 						{
@@ -67,7 +69,7 @@ func TestCheckPodsBadCondition(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "status condition ContainersReady is False", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Critical, result.Symptoms[0].Severity)
 }
 
 func TestCheckPodsBadContainerStatuses(t *testing.T) {
@@ -83,7 +85,7 @@ func TestCheckPodsBadContainerStatuses(t *testing.T) {
 					},
 				},
 				Status: v1.PodStatus{
-					StartTime:  createNewTimeStampPtr(time.Now()),
+					StartTime:  new(metav1.NewTime(time.Now())),
 					Phase:      "Running",
 					Conditions: []v1.PodCondition{},
 					ContainerStatuses: []v1.ContainerStatus{
@@ -102,7 +104,7 @@ func TestCheckPodsBadContainerStatuses(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "container 'c1' is not ready but pod started 0.0 mins ago", result.Symptoms[0].Message)
-	assert.Equal(t, "warning", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Warning, result.Symptoms[0].Severity)
 }
 
 func TestCheckPodsBadContainerStatusesOld(t *testing.T) {
@@ -118,7 +120,7 @@ func TestCheckPodsBadContainerStatusesOld(t *testing.T) {
 					},
 				},
 				Status: v1.PodStatus{
-					StartTime:  createNewTimeStampPtr(time.Now().Add(-10 * time.Minute)),
+					StartTime:  new(metav1.NewTime(time.Now().Add(-10 * time.Minute))),
 					Phase:      "Running",
 					Conditions: []v1.PodCondition{},
 					ContainerStatuses: []v1.ContainerStatus{
@@ -137,7 +139,7 @@ func TestCheckPodsBadContainerStatusesOld(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "container 'c1' is not ready", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Critical, result.Symptoms[0].Severity)
 }
 
 func TestCheckPodsWithRestartsButOld(t *testing.T) {
@@ -153,7 +155,7 @@ func TestCheckPodsWithRestartsButOld(t *testing.T) {
 					},
 				},
 				Status: v1.PodStatus{
-					StartTime:  createNewTimeStampPtr(time.Now()),
+					StartTime:  new(metav1.NewTime(time.Now())),
 					Phase:      "Running",
 					Conditions: []v1.PodCondition{},
 					ContainerStatuses: []v1.ContainerStatus{
@@ -179,7 +181,7 @@ func TestCheckPodsWithRestartsButOld(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "container 'c1' has been restarted 1 times", result.Symptoms[0].Message)
-	assert.Equal(t, "warning", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Warning, result.Symptoms[0].Severity)
 }
 
 func TestCheckPodsWithRestarts(t *testing.T) {
@@ -195,7 +197,7 @@ func TestCheckPodsWithRestarts(t *testing.T) {
 					},
 				},
 				Status: v1.PodStatus{
-					StartTime:  createNewTimeStampPtr(time.Now()),
+					StartTime:  new(metav1.NewTime(time.Now())),
 					Phase:      "Running",
 					Conditions: []v1.PodCondition{},
 					ContainerStatuses: []v1.ContainerStatus{
@@ -221,7 +223,7 @@ func TestCheckPodsWithRestarts(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "container 'c1' was restarted 0.0 mins ago: 1 (exit code) Crashed (reason)", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Critical, result.Symptoms[0].Severity)
 }
 
 func TestCheckPodsWithRestartsAndRunning(t *testing.T) {
@@ -237,7 +239,7 @@ func TestCheckPodsWithRestartsAndRunning(t *testing.T) {
 					},
 				},
 				Status: v1.PodStatus{
-					StartTime:  createNewTimeStampPtr(time.Now()),
+					StartTime:  new(metav1.NewTime(time.Now())),
 					Phase:      "Running",
 					Conditions: []v1.PodCondition{},
 					ContainerStatuses: []v1.ContainerStatus{
@@ -272,7 +274,7 @@ func TestCheckPodsNoOwner(t *testing.T) {
 					OwnerReferences: []metav1.OwnerReference{},
 				},
 				Status: v1.PodStatus{
-					StartTime:  createNewTimeStampPtr(time.Now()),
+					StartTime:  new(metav1.NewTime(time.Now())),
 					Phase:      "Running",
 					Conditions: []v1.PodCondition{},
 				},
@@ -284,5 +286,5 @@ func TestCheckPodsNoOwner(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "has no owner", result.Symptoms[0].Message)
-	assert.Equal(t, "warning", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Warning, result.Symptoms[0].Severity)
 }

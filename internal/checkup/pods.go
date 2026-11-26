@@ -4,104 +4,83 @@ import (
 	"fmt"
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
+
 	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
 	"github.com/max-rocket-internet/kube-doctor/internal/log"
-	v1 "k8s.io/api/core/v1"
 )
 
-func CheckPods(resources *v1.PodList) (results symptoms.SymptomList) {
-	resourceType := "Pod"
+const (
+	// Containers in pods younger than this are allowed to be not ready yet.
+	containerStartupGracePeriod = 3 * time.Minute
+	// Restarts older than this are reported as warnings rather than critical.
+	recentRestartWindow = time.Hour
+)
+
+func CheckPods(resources *corev1.PodList) (results symptoms.SymptomList) {
+	const resourceType = "Pod"
 
 	log.PrintBegin(len(resources.Items), resourceType)
 
 	for _, pod := range resources.Items {
-		log.Debug(fmt.Sprintf("Examining Pod %s/%s", pod.Namespace, pod.Name))
+		log.Debugf("Examining Pod %s/%s", pod.Namespace, pod.Name)
 
-		if pod.Status.Phase == "Succeeded" {
+		if pod.Status.Phase == corev1.PodSucceeded {
 			continue
 		}
 
-		if pod.Status.Phase != "Running" {
+		add := func(severity symptoms.Severity, message string) {
 			results.Add(symptoms.Symptom{
-				Message:      "not running",
-				Severity:     "critical",
+				Message:      message,
+				Severity:     severity,
 				ResourceName: pod.Name,
 				ResourceType: resourceType,
 				Namespace:    pod.Namespace,
 			})
 		}
 
-		for _, sc := range pod.Status.Conditions {
-			if sc.Status != "True" {
-				results.Add(symptoms.Symptom{
-					Message:      fmt.Sprintf("status condition %s is %s", sc.Type, sc.Status),
-					Severity:     "critical",
-					ResourceName: pod.Name,
-					ResourceType: resourceType,
-					Namespace:    pod.Namespace,
-				})
+		if pod.Status.Phase != corev1.PodRunning {
+			add(symptoms.Critical, "not running")
+		}
+
+		for _, condition := range pod.Status.Conditions {
+			if condition.Status != corev1.ConditionTrue {
+				add(symptoms.Critical, fmt.Sprintf("status condition %s is %s", condition.Type, condition.Status))
 			}
 		}
 
-		for _, scs := range pod.Status.ContainerStatuses {
-			if !scs.Ready {
-				if time.Since(pod.Status.StartTime.Time).Minutes() < 3 {
-					results.Add(symptoms.Symptom{
-						Message:      fmt.Sprintf("container '%s' is not ready but pod started %.1f mins ago", scs.Name, time.Since(pod.Status.StartTime.Time).Minutes()),
-						Severity:     "warning",
-						ResourceName: pod.Name,
-						ResourceType: resourceType,
-						Namespace:    pod.Namespace,
-					})
+		// StartTime is unset until the kubelet has accepted the pod, so treat it as just started.
+		var podAge time.Duration
+		if pod.Status.StartTime != nil {
+			podAge = time.Since(pod.Status.StartTime.Time)
+		}
+
+		for _, cs := range pod.Status.ContainerStatuses {
+			if !cs.Ready {
+				if podAge < containerStartupGracePeriod {
+					add(symptoms.Warning, fmt.Sprintf("container '%s' is not ready but pod started %.1f mins ago", cs.Name, podAge.Minutes()))
 				} else {
-					results.Add(symptoms.Symptom{
-						Message:      fmt.Sprintf("container '%s' is not ready", scs.Name),
-						Severity:     "critical",
-						ResourceName: pod.Name,
-						ResourceType: resourceType,
-						Namespace:    pod.Namespace,
-					})
+					add(symptoms.Critical, fmt.Sprintf("container '%s' is not ready", cs.Name))
 				}
 			}
 
-			if scs.RestartCount > 0 && scs.LastTerminationState.Terminated != nil {
-				if time.Since(scs.LastTerminationState.Terminated.FinishedAt.Time).Hours() > 1 {
-					results.Add(symptoms.Symptom{
-						Message:      fmt.Sprintf("container '%s' has been restarted %d times", scs.Name, scs.RestartCount),
-						Severity:     "warning",
-						ResourceName: pod.Name,
-						ResourceType: resourceType,
-						Namespace:    pod.Namespace,
-					})
+			if terminated := cs.LastTerminationState.Terminated; cs.RestartCount > 0 && terminated != nil {
+				sinceRestart := time.Since(terminated.FinishedAt.Time)
+				if sinceRestart > recentRestartWindow {
+					add(symptoms.Warning, fmt.Sprintf("container '%s' has been restarted %d times", cs.Name, cs.RestartCount))
 				} else {
-					results.Add(symptoms.Symptom{
-						Message: fmt.Sprintf("container '%s' was restarted %.1f mins ago: %d (exit code) %s (reason)",
-							scs.Name,
-							time.Since(scs.LastTerminationState.Terminated.FinishedAt.Time).Minutes(),
-							scs.LastTerminationState.Terminated.ExitCode,
-							scs.LastTerminationState.Terminated.Reason,
-						),
-						Severity:     "critical",
-						ResourceName: pod.Name,
-						ResourceType: resourceType,
-						Namespace:    pod.Namespace,
-					})
+					add(symptoms.Critical, fmt.Sprintf("container '%s' was restarted %.1f mins ago: %d (exit code) %s (reason)",
+						cs.Name, sinceRestart.Minutes(), terminated.ExitCode, terminated.Reason))
 				}
 			}
 		}
 
 		if len(pod.OwnerReferences) == 0 {
-			results.Add(symptoms.Symptom{
-				Message:      "has no owner",
-				Severity:     "warning",
-				ResourceName: pod.Name,
-				ResourceType: resourceType,
-				Namespace:    pod.Namespace,
-			})
+			add(symptoms.Warning, "has no owner")
 		}
 	}
 
-	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
+	log.PrintEnd(len(resources.Items), results.Count())
 
 	return results
 }

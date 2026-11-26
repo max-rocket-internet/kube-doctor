@@ -6,6 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
 )
 
 func TestCheckServices(t *testing.T) {
@@ -31,7 +33,7 @@ func TestCheckServices(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "LoadBalancer service has no ingress points", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Critical, result.Symptoms[0].Severity)
 }
 
 func TestCheckServicesIgnored(t *testing.T) {

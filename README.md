@@ -14,8 +14,8 @@ $ kube-doctor --warning-symptoms --non-namespaced-resources
 == Checking Deployment resources
 👀 Deployment opencost/opencost: container 'opencost' memory request and limit are not equal
 👀 Deployment default/application-one-listener: 5/8 pods are not ready
-== Checking Endpoint resources
-❌ Endpoint default/application-two: no ready addresses in subsets
+== Checking EndpointSlice resources
+❌ EndpointSlice default/application-two: no ready endpoints
 == Checking Event resources
 ❌ Event datadog/datadog-x62q2: (Pod) 43.4 minutes ago: network is not ready: container runtime network not ready: NetworkReady=fals...
 ❌ Event default/application-one-597f47458c-fdb4r: (Pod) 1.6 minutes ago: Back-off restarting failed container
@@ -52,14 +52,15 @@ This tool will check for the following symptoms:
   - memory request and limit are not equal
 - `DaemonSet`:
   - pods are not ready
-  - pods are miss-scheduled
+  - pods are misscheduled
   - rolling update in progress
 - `Deployment`:
   - minimum availability not met
   - ReplicaSet update in progress
   - ReplicaSet update in progress but no progress
-- `Endpoint`:
-  - no ready addresses in subsets
+- `EndpointSlice` (aggregated per Service):
+  - no ready endpoints
+  - some endpoints not ready
 - `Event`:
   - `cluster-autoscaler` events that are:
     - events that are not `Type=Normal`
@@ -131,12 +132,11 @@ cd kube-doctor
 go build ./... && go install ./...
 ```
 
-Run from `main` branch without `git`:
+Install the latest version without cloning (requires Go 1.26+):
 
 ```console
 go install github.com/max-rocket-internet/kube-doctor@latest
-cd $GOPATH/pkg/mod/github.com/max-rocket-internet/kube-doctor*/
-go run main.go
+kube-doctor --help
 ```
 
 To download a binary, check [the releases](https://github.com/max-rocket-internet/kube-doctor/releases).

@@ -8,24 +8,24 @@ import (
 	"github.com/max-rocket-internet/kube-doctor/internal/log"
 )
 
-func KubeApiHealthStatuses(resources *statuses.KubeApiHealthEndpointStatusList) (results symptoms.SymptomList) {
-	resourceType := "KubeApiHealthEndpointStatus"
+func CheckKubeAPIHealth(resources *statuses.KubeAPIHealthEndpointStatusList) (results symptoms.SymptomList) {
+	const resourceType = "KubeApiHealthEndpointStatus"
 
 	log.PrintBegin(len(resources.Items), resourceType)
 
 	for _, status := range resources.Items {
-		log.Debug(fmt.Sprintf("Examining KubeApiHealthEndpointStatus %s", status.Name))
+		log.Debugf("Examining KubeApiHealthEndpointStatus %s", status.Name)
 
-		if status.Status != "ok" {
+		if status.Status != statuses.StatusOK {
 			results.Add(symptoms.Symptom{
-				Message:      fmt.Sprintf("Kubnernetes API health endpoint '%s' %s=%s", status.Path, status.Name, status.Status),
-				Severity:     "critical",
+				Message:      fmt.Sprintf("Kubernetes API health endpoint '%s' %s=%s", status.Path, status.Name, status.Status),
+				Severity:     symptoms.Critical,
 				ResourceType: resourceType,
 			})
 		}
 	}
 
-	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
+	log.PrintEnd(len(resources.Items), results.Count())
 
 	return results
 }

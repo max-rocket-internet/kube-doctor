@@ -7,7 +7,7 @@ import (
 )
 
 func TestCheckServices(t *testing.T) {
-	r := KubeApiHealthEndpointStatusList{}
+	r := KubeAPIHealthEndpointStatusList{}
 	r.AddRawLine("[+]etcd-readiness ok", "/readyz")
 
 	assert.Len(t, r.Items, 1)

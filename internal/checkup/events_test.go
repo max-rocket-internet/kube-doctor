@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
 )
 
 func TestEventsClusterAutoscalerScaling(t *testing.T) {
@@ -31,7 +33,7 @@ func TestEventsClusterAutoscalerScaling(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "(Pod) 0.0 minutes ago: a message", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Critical, result.Symptoms[0].Severity)
 }
 
 func TestEventsServiceControllerNotNormal(t *testing.T) {
@@ -56,7 +58,7 @@ func TestEventsServiceControllerNotNormal(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "(Pod) 0.0 minutes ago: a message", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Critical, result.Symptoms[0].Severity)
 }
 
 func TestEventsDefaultSchedulerNotNormal(t *testing.T) {
@@ -81,7 +83,7 @@ func TestEventsDefaultSchedulerNotNormal(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "(Pod) 0.0 minutes ago: a message", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Critical, result.Symptoms[0].Severity)
 }
 
 func TestEventsKubeletNotNormal(t *testing.T) {
@@ -106,7 +108,7 @@ func TestEventsKubeletNotNormal(t *testing.T) {
 
 	assert.Len(t, result.Symptoms, 1)
 	assert.Equal(t, "(Pod) 0.0 minutes ago: a message", result.Symptoms[0].Message)
-	assert.Equal(t, "critical", result.Symptoms[0].Severity)
+	assert.Equal(t, symptoms.Critical, result.Symptoms[0].Severity)
 }
 
 func TestEventsNormalToBeIgnored(t *testing.T) {

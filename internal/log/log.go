@@ -1,119 +1,107 @@
+// Package log prints checkup progress and symptoms to the terminal.
 package log
 
 import (
 	"fmt"
-	"log"
+	"io"
 	"os"
 
 	"github.com/fatih/color"
 	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
 )
 
+const messageCharacterLimit = 120
+
 var (
-	debugLogger            *log.Logger
-	infoLogger             *log.Logger
-	logWarningSymptoms     bool
-	logDebug               bool
+	out    io.Writer = os.Stdout
+	errOut io.Writer = os.Stderr
+
+	logWarningSymptoms bool
+	logDebug           bool
+
 	colorResourceTypeBold  = color.New(color.FgMagenta, color.Bold).SprintFunc()
 	colorResourceType      = color.New(color.FgMagenta).SprintFunc()
 	colorResourceName      = color.New(color.FgBlue, color.Bold).SprintFunc()
 	colorResourceNamespace = color.New(color.FgGreen).SprintFunc()
 	colorDebug             = color.New(color.Faint).SprintFunc()
-	messageCharacterLimit  = 120
 )
 
-func init() {
-	debugLogger = log.New(os.Stdout, "", 0)
-	infoLogger = log.New(os.Stdout, "", 0)
+// Setup configures which messages are printed.
+func Setup(debugEnabled, warningSymptoms bool) {
+	logDebug = debugEnabled
+	logWarningSymptoms = warningSymptoms
 }
 
-func Setup(debugEnabled bool, warningSymptoms bool) {
-	if debugEnabled {
-		logDebug = true
-	}
-
-	if warningSymptoms {
-		logWarningSymptoms = true
-	}
-}
-
-func Debug(message string) {
+// Debugf prints a debug message when debug logging is enabled.
+func Debugf(format string, args ...any) {
 	if !logDebug {
 		return
 	}
-	debugLogger.Println(colorDebug(fmt.Sprintf("DEBUG: %s", message)))
+	_, _ = fmt.Fprintln(out, colorDebug("DEBUG: "+fmt.Sprintf(format, args...)))
 }
 
+// Info prints a message to stdout.
 func Info(message string) {
-	infoLogger.Println(message)
+	_, _ = fmt.Fprintln(out, message)
 }
 
-func Error(message string, e error) {
-	infoLogger.Printf("❗ %s: %s\n", message, e)
+// Infof prints a formatted message to stdout.
+func Infof(format string, args ...any) {
+	Info(fmt.Sprintf(format, args...))
 }
 
-func Fatal(message string, e error) {
-	infoLogger.Fatalf("💣 %s: %s\n", message, e)
+// Errorf prints a formatted error message to stderr.
+func Errorf(format string, args ...any) {
+	_, _ = fmt.Fprintf(errOut, "❗ %s\n", fmt.Sprintf(format, args...))
 }
 
 func trimMessage(message string) string {
-	if len(message) > messageCharacterLimit {
-		return fmt.Sprintf("%s...", string([]byte(message)[:messageCharacterLimit]))
-	} else {
+	runes := []rune(message)
+	if len(runes) <= messageCharacterLimit {
 		return message
 	}
+	return string(runes[:messageCharacterLimit]) + "..."
 }
 
-func LogSymptoms(s symptoms.SymptomList) {
-	for _, s := range s.Symptoms {
+// LogSymptoms prints every symptom in l, honouring the warning-symptoms setting.
+func LogSymptoms(l symptoms.SymptomList) {
+	for _, s := range l.Symptoms {
 		var message string
-
-		if s.ResourceName == "" {
+		switch {
+		case s.ResourceName == "":
 			message = fmt.Sprintf("%s: %s", colorResourceType(s.ResourceType), trimMessage(s.Message))
-		} else if s.Namespace == "" {
+		case s.Namespace == "":
 			message = fmt.Sprintf("%s %s: %s", colorResourceType(s.ResourceType), s.ResourceName, trimMessage(s.Message))
-		} else {
+		default:
 			message = fmt.Sprintf("%s %s/%s: %s", colorResourceType(s.ResourceType), colorResourceNamespace(s.Namespace), colorResourceName(s.ResourceName), trimMessage(s.Message))
 		}
 
 		switch s.Severity {
-		case "warning":
+		case symptoms.Warning:
 			if logWarningSymptoms {
-				Info(fmt.Sprintf("👀 %s", message))
+				Info("👀 " + message)
 			}
-		case "critical":
-			Info(fmt.Sprintf("❌ %s", message))
+		case symptoms.Critical:
+			Info("❌ " + message)
 		default:
-			Error(fmt.Sprintf("unknown symptom severity: %s", s.Severity), nil)
+			Errorf("unknown symptom severity: %q", s.Severity)
 		}
 	}
 }
 
+// PrintBegin prints the header for a resource type check.
 func PrintBegin(resourceCount int, resourceType string) {
-	Info(fmt.Sprintf("== Checking %d %s resources", resourceCount, colorResourceTypeBold(resourceType)))
+	Infof("== Checking %d %s resources", resourceCount, colorResourceTypeBold(resourceType))
 }
 
-func PrintEnd(resourceCount int, symptomCounts [2]int) {
-	criticalCount := symptomCounts[0]
-	warningCount := symptomCounts[1]
-	totalSymptomCount := criticalCount + warningCount
-
-	if resourceCount == 0 {
+// PrintEnd prints a summary line for a resource type check when appropriate.
+func PrintEnd(resourceCount int, counts symptoms.Counts) {
+	switch {
+	case resourceCount == 0:
 		Info("⭕️ No resources found")
-		return
-	}
-
-	if totalSymptomCount == 0 {
+	case counts.Total() == 0:
 		Info("🎉 No symptoms found")
-		return
+	case counts.Critical == 0 && !logWarningSymptoms:
+		Infof("👀 No critical symptoms found but %d warning symptoms", counts.Warning)
 	}
-
-	if (warningCount == 0 && criticalCount > 0) || logWarningSymptoms {
-		return
-	}
-
-	if criticalCount == 0 && warningCount > 0 && !logWarningSymptoms {
-		Info(fmt.Sprintf("👀 No critcal symptoms found but %d warning symptoms", warningCount))
-	}
-
 }

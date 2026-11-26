@@ -1,33 +1,33 @@
 package checkup
 
 import (
-	"fmt"
 	"time"
+
+	corev1 "k8s.io/api/core/v1"
 
 	"github.com/max-rocket-internet/kube-doctor/internal/checkup/symptoms"
 	"github.com/max-rocket-internet/kube-doctor/internal/log"
-	v1 "k8s.io/api/core/v1"
 )
 
-func CheckPersistentVolumes(resources *v1.PersistentVolumeList) (results symptoms.SymptomList) {
-	resourceType := "PersistentVolume"
+func CheckPersistentVolumes(resources *corev1.PersistentVolumeList) (results symptoms.SymptomList) {
+	const resourceType = "PersistentVolume"
 
 	log.PrintBegin(len(resources.Items), resourceType)
 
 	for _, volume := range resources.Items {
-		log.Debug(fmt.Sprintf("Examining PersistentVolume %s", volume.Name))
+		log.Debugf("Examining PersistentVolume %s", volume.Name)
 
-		if volume.Status.Phase != "Bound" && time.Since(volume.CreationTimestamp.Time).Minutes() > 5 {
+		if volume.Status.Phase != corev1.VolumeBound && time.Since(volume.CreationTimestamp.Time) > volumeBindGracePeriod {
 			results.Add(symptoms.Symptom{
 				Message:      "older than 5 minutes and status is not bound",
-				Severity:     "critical",
+				Severity:     symptoms.Critical,
 				ResourceName: volume.Name,
 				ResourceType: resourceType,
 			})
 		}
 	}
 
-	log.PrintEnd(len(resources.Items), results.CountSymptomsSeverity())
+	log.PrintEnd(len(resources.Items), results.Count())
 
 	return results
 }
