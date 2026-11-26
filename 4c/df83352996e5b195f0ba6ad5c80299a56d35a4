@@ -1,0 +1,119 @@
+internal/checkup/persistentvolumes.go
+  s_4cbe22f3d89bb1::t_82d968c5c75b9d 6-7,12-13,18,20,23,30
+internal/checkup/services.go
+  s_4cbe22f3d89bb1::t_82d968c5c75b9d 4,10-11,16-25,29
+internal/checkup/symptoms/symptoms.go
+  s_4cbe22f3d89bb1::t_7890fe3b7eeb6b 1,4-12,14,21,26,31-43,45-49,55,58,62,67
+internal/checkup/container_test.go
+  s_4cbe22f3d89bb1::t_be702986ef6210 9-10
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 23,38,56,77
+internal/checkup/horizontalpodautoscalers_test.go
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 13,34,38,41,62,66,69,90
+  s_4cbe22f3d89bb1::t_be702986ef6210 9-10
+internal/checkup/services_test.go
+  s_4cbe22f3d89bb1::t_be702986ef6210 9-10
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 36
+internal/checkup/events_test.go
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 36,61,86,111
+  s_4cbe22f3d89bb1::t_be702986ef6210 10-11
+internal/checkup/endpoints.go
+  s_4cbe22f3d89bb1::t_82d968c5c75b9d 58,66-69,71,73-75,84
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 5-7,9-10,16-23,27-48,50-57,59-65,70,72,76-80
+internal/checkup/jobs.go
+  s_4cbe22f3d89bb1::t_82d968c5c75b9d 7-9,14-16,18,23,25,34,37,46
+internal/checkup/persistentvolumeclaims_test.go
+  s_4cbe22f3d89bb1::t_be702986ef6210 10-11
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 33
+internal/checkup/deployments_test.go
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 22,25-26,42,53,56-57,74,85,88-89,106,117,120-121,131
+  s_4cbe22f3d89bb1::t_be702986ef6210 10-11
+internal/checkup/kubeapihealth.go
+  s_4cbe22f3d89bb1::t_82d968c5c75b9d 11-12,17,19,21-22,28
+internal/checkup/endpoints_test.go
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 7-10,13-18,21-26,29-52,56-79,81
+internal/checkup/kubeapihealth_test.go
+  s_4cbe22f3d89bb1::t_7dccf930cbb5e8 9
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 13,17,20-21,25,29
+  s_4cbe22f3d89bb1::t_be702986ef6210 7-8
+internal/checkup/deployments.go
+  s_4cbe22f3d89bb1::t_ee1930dcfe77d7 48
+  s_4cbe22f3d89bb1::t_82d968c5c75b9d 7-10,15-16,18,23-33,37,42-43,45-47,50,55-58,62
+internal/kubernetes/statuses/statuses.go
+  s_4cbe22f3d89bb1::t_06f39d9e6875e4 1,4-9,12-13,19-21,24-25,29-33,37-41,44,50-53
+  s_4cbe22f3d89bb1::t_38688ae2e9eb13 54
+internal/checkup/pods_test.go
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 27,39,55,72,88,107,123,142,158,184,200,226,242,277,289
+  s_4cbe22f3d89bb1::t_be702986ef6210 10-11
+README.md
+  s_4cbe22f3d89bb1::t_89d7fe93a8a93a 135,139
+  s_4cbe22f3d89bb1::t_d2b749f322e6d1 17-18,55,61-63
+go.mod
+  s_4cbe22f3d89bb1::t_626c3361a268dc 3,8,12,18,23-33,43-45,53,58-59
+  s_4cbe22f3d89bb1::t_33d2db242ec630 6-7,9-11,16-17,19-22,34-35,37-38,40,42,46-52,55-57,60
+internal/kubernetes/kubernetes.go
+  s_4cbe22f3d89bb1::t_204f8506dbcfd5 1,6,8,17-20,25-31,35,38,40,43,45,48-51,54-58,61-66,69-70,72-74,78-79,83
+internal/checkup/horizontalpodautoscalers.go
+  s_4cbe22f3d89bb1::t_82d968c5c75b9d 6-9,14-15,20-23,26,29,38,42-53
+  s_4cbe22f3d89bb1::t_04dbb5e5535dc7 54
+internal/checkup/persistentvolumes_test.go
+  s_4cbe22f3d89bb1::t_be702986ef6210 10-11
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 33
+internal/checkup/container.go
+  s_4cbe22f3d89bb1::t_82d968c5c75b9d 4,10-11,13,16-17,21-32
+  s_4cbe22f3d89bb1::t_2f47ab4fb41f02 33-34
+internal/checkup/nodes.go
+  s_4cbe22f3d89bb1::t_82d968c5c75b9d 7-8,13-18,24-33,38-46,48-49,57,62
+internal/checkup/persistentvolumeclaims.go
+  s_4cbe22f3d89bb1::t_82d968c5c75b9d 6-7,12-16,21,23,26,29,34
+internal/checkup/nodes_test.go
+  s_4cbe22f3d89bb1::t_be702986ef6210 10-11
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 41,71,102,149
+.github/workflows/test.yaml
+  s_4cbe22f3d89bb1::t_92a3294b58eaaa 3-10,21,24-25,27
+internal/checkup/jobs_test.go
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 7
+  s_4cbe22f3d89bb1::t_be702986ef6210 11-12
+  s_4cbe22f3d89bb1::t_d96cbf0cbf2509 21,35,49,67
+  s_4cbe22f3d89bb1::t_b2b8525b9f5935 8
+internal/checkup/events.go
+  s_4cbe22f3d89bb1::t_82d968c5c75b9d 7-8,14-15,17-18,23-24,27-33,36,40-55
+  s_4cbe22f3d89bb1::t_e88eb9760a57b4 56
+internal/log/log.go
+  s_4cbe22f3d89bb1::t_6c2d7b16faf6c2 1,6,13-14,16-21,29-32,35-36,43,48-50,53-54,59-60,63,66-68,70-71,73,75,80,82,84-85,87,92,94,97-100,102,104-105
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 40,45,55
+internal/checkup/daemonsets.go
+  s_4cbe22f3d89bb1::t_82d968c5c75b9d 6-7,12-13,18,20,22-23,30-33,36-48,52
+internal/doctor/checkup.go
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 1,5,8-14,16,21-38,40-56,58-104,106-110,113
+.github/workflows/fmt.yaml
+  s_4cbe22f3d89bb1::t_92a3294b58eaaa 22,26
+.github/workflows/release.yaml
+  s_4cbe22f3d89bb1::t_92a3294b58eaaa 24,30
+internal/checkup/daemonsets_test.go
+  s_4cbe22f3d89bb1::t_d0c229d11236ca 29,48-49,68
+  s_4cbe22f3d89bb1::t_be702986ef6210 8-9
+go.sum
+  s_4cbe22f3d89bb1::t_db52459240932b 3-50,52-53,56-59,64-65,69-72,74-75,77-103,106-125
+internal/checkup/pods.go
+  s_4cbe22f3d89bb1::t_ee273e5996d5ac 7-8,13-21,26,28,32,34-35,42-48,52-61,63,67-70,72-73,79,83
+internal/kubernetes/statuses/statuses_test.go
+  s_4cbe22f3d89bb1::t_1699af0d6d374f 10
+main.go
+  s_4cbe22f3d89bb1::t_d7e01374c555e7 1,5-6,8-12,17-19,21-31,33,35,58-65,69-79,81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4cdf83352996e5b195f0ba6ad5c80299a56d35a4",
+  "prompts": {},
+  "sessions": {
+    "s_4cbe22f3d89bb1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ac444d5f-0d8b-4cd3-ad84-9623425a0569",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Max Williams <max-rocket-internet@users.noreply.github.com>"
+    }
+  }
+}
